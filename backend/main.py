@@ -22,7 +22,7 @@ class Post(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-
+Base.metadata.drop_all(bind=engine); ########################################## 테스트 목적으로 추가한 코드. 최종 코드에서는 삭제 필요
 Base.metadata.create_all(bind=engine)
 
 
@@ -110,9 +110,9 @@ def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
         if data.title is not None:
-            post.title = data.title
+            post.title = data.title # type : ignore
         if data.content is not None:
-            post.content = data.content
+            post.content = data.content # type : ignore
         db.commit()
         db.refresh(post)
         return post

@@ -24,12 +24,20 @@ export default async function PostsPage() {
     <main>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">게시글 목록</h1>
-        <Link
-          href="/posts/new"
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          새 글 작성
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/search"
+            className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            검색
+          </Link>
+          <Link
+            href="/posts/new"
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            새 글 작성
+          </Link>
+        </div>
       </div>
 
       {posts.length === 0 ? (
