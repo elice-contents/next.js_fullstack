@@ -1,7 +1,10 @@
 # main.py — FastAPI + SQLite Blog API
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, or_
+# or_: SQLAlchemy에서 여러 조건을 OR로 연결할 때 사용하는 함수
+# 예) or_(Post.title.ilike(...), Post.content.ilike(...))
+#     → WHERE title LIKE ... OR content LIKE ...
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
@@ -22,7 +25,6 @@ class Post(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-Base.metadata.drop_all(bind=engine); ########################################## 테스트 목적으로 추가한 코드. 최종 코드에서는 삭제 필요
 Base.metadata.create_all(bind=engine)
 
 
@@ -74,8 +76,32 @@ def get_db():
 
 
 # ─── GET /posts ──────────────────────────────────────────
+
+# ─── [실습 1: Fetch 기반 검색 기능 구현하기] 쿼리 파라미터 없이 전체 반환 ────
+# (실습 2에서도 동일하게 사용 — Axios 리팩토링은 프런트엔드만 변경)
+# @app.get("/posts", response_model=list[PostResponse])
+# def get_posts(db: Session = Depends(get_db)):
+#     return db.query(Post).all()
+
+# ─── [실습 3: 검색 기능 고도화하기] 검색어(q)가 있으면 필터링, 없으면 전체 반환 ──
 @app.get("/posts", response_model=list[PostResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(q: Optional[str] = None, db: Session = Depends(get_db)):
+    # q: URL 쿼리 파라미터 (?q=검색어)
+    # FastAPI는 경로 파라미터({post_id})와 달리
+    # 함수 인자로 선언하는 것만으로 쿼리 파라미터를 자동 파싱함
+    # Optional[str] = None → 검색어가 없으면 None (기존 동작 유지)
+    if q:
+        # ilike: 대소문자 구분 없는 LIKE 검색 (case-insensitive)
+        #        일반 like("%검색어%")는 대소문자를 구분함
+        # f"%{q}%": '%검색어%' 패턴 → 앞뒤로 어떤 문자든 포함되면 매칭
+        return db.query(Post).filter(
+            or_(
+                Post.title.ilike(f"%{q}%"),
+                Post.content.ilike(f"%{q}%"),
+            )
+        ).all()
+
+    # q가 없으면 기존과 동일하게 전체 반환
     return db.query(Post).all()
 
 
