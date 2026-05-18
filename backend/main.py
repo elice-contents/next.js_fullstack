@@ -77,12 +77,6 @@ def get_db():
 
 # ─── GET /posts ──────────────────────────────────────────
 
-# ─── [실습 1: Fetch 기반 검색 기능 구현하기] 쿼리 파라미터 없이 전체 반환 ────
-# (실습 2에서도 동일하게 사용 — Axios 리팩토링은 프런트엔드만 변경)
-# @app.get("/posts", response_model=list[PostResponse])
-# def get_posts(db: Session = Depends(get_db)):
-#     return db.query(Post).all()
-
 # ─── [실습 3: 검색 기능 고도화하기] 검색어(q)가 있으면 필터링, 없으면 전체 반환 ──
 @app.get("/posts", response_model=list[PostResponse])
 def get_posts(q: Optional[str] = None, db: Session = Depends(get_db)):

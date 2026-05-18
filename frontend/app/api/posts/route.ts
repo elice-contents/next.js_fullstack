@@ -6,22 +6,6 @@
 // → FASTAPI_URL(접두사 없음)을 서버에서만 사용하므로 브라우저에 노출되지 않음
 // → NEXT_PUBLIC_FASTAPI_URL 환경변수가 더 이상 필요 없어짐
 
-// ─── [실습 1: Fetch 기반 검색 기능 구현하기] 쿼리 파라미터 없이 전체 목록만 반환 ─
-// (실습 2에서도 동일하게 사용 — Axios 리팩토링은 프런트엔드만 변경)
-// export async function GET() {
-//   const res = await fetch(`${process.env.FASTAPI_URL}/posts`);
-
-//   if (!res.ok) {
-//     return Response.json(
-//       { detail: "게시글 목록을 불러오는 데 실패했습니다" },
-//       { status: res.status }
-//     );
-//   }
-
-//   const data = await res.json();
-//   return Response.json(data);
-// }
-
 // ─── [실습 3: 검색 기능 고도화하기] 브라우저에서 받은 q 파라미터를 FastAPI로 전달 ─
 // GET(request: Request) → Next.js가 자동으로 현재 요청 객체를 인자로 주입
 export async function GET(request: Request) {

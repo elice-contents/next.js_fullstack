@@ -5,10 +5,6 @@
 //    Server Component(기본값)에서는 이 훅들을 쓸 수 없음
 "use client";
 
-// ─── [실습 1: Fetch 기반 검색 기능 구현하기] import ──────────
-// (실습 2에서도 동일하게 사용 — Axios 리팩토링 시 import는 변경 없음)
-// import { useState, useEffect } from "react";
-
 // ─── [실습 3: 검색 기능 고도화하기 - import] ─────────────
 // useSearchParams: 현재 URL의 쿼리 파라미터를 읽는 Next.js 훅
 // useRouter: router.push()로 URL을 프로그래밍 방식으로 변경하는 Next.js 훅
@@ -42,10 +38,6 @@ function SearchContent() {
   // ─── 상태 4개 선언 ────────────────────────────────────
   // useState<타입>(초기값) 형태로 선언
 
-  // ─── [실습 1: Fetch 기반 검색 기능 구현하기] 검색어 상태: 빈 문자열로 초기화 ──
-  // (실습 2에서도 동일하게 사용)
-  // const [query, setQuery] = useState("");
-
   // ─── [실습 3: 검색 기능 고도화하기] URL의 q 파라미터 값으로 초기화 ──
   // /search?q=react 로 직접 접근해도 검색어가 입력창에 반영됨
   // searchParams.get("q"): URL에 ?q=값이 없으면 null 반환 → ?? ""로 빈 문자열 폴백
@@ -64,35 +56,6 @@ function SearchContent() {
       setError(null);     // 이전 에러 초기화
 
       try {
-        // ─── [실습 1: Fetch 기반 검색 기능 구현하기] 직접 호출 방식 (NEXT_PUBLIC_ 환경변수 필요) ──
-        // 브라우저가 FastAPI 서버를 직접 호출
-        // NEXT_PUBLIC_ 접두사 덕분에 빌드 시 번들에 포함되어 브라우저에서도 접근 가능
-        // (접두사 없는 FASTAPI_URL은 서버 측에서만 유효 → 여기선 undefined가 됨)
-        // const base = process.env.NEXT_PUBLIC_FASTAPI_URL;
-        // const res = await fetch(`${base}/posts`);
-
-        // ─── [실습 1: Fetch 기반 검색 기능 구현하기] Route Handler 방식 (NEXT_PUBLIC_ 환경변수 불필요) ─
-        // 브라우저가 Next.js Route Handler(/api/posts)를 호출
-        // Route Handler가 서버에서 FastAPI를 대신 호출하므로
-        // FastAPI URL이 브라우저에 노출되지 않음
-        // const res = await fetch("/api/posts");
-
-        // ─── [실습 1: Fetch 기반 검색 기능 구현하기] HTTP 에러 수동 처리 ──
-        // fetch는 네트워크 오류만 throw하고, 4xx·5xx는 정상 응답으로 간주함
-        // → res.ok를 직접 확인해서 에러를 수동으로 throw해야 함
-        // if (!res.ok) {
-        //   throw new Error("게시글 목록을 불러오는 데 실패했습니다");
-        // }
-        // const data: Post[] = await res.json();
-        // setResults(data);
-
-        // ─── [실습 2: Axios로 검색 기능 리팩토링하기] Route Handler 방식 — 전체 목록 fetch ──
-        // axios.get<타입>(URL) → 응답 데이터가 res.data에 바로 담김
-        // fetch처럼 res.json()을 별도로 호출할 필요 없음
-        // axios는 4xx·5xx 응답을 자동으로 throw → res.ok 체크 불필요
-        // const res = await axios.get<Post[]>("/api/posts");
-        // setResults(res.data);
-
         // ─── [실습 3: 검색 기능 고도화하기] 검색어를 쿼리 파라미터로 전달 ──
         // query가 있으면 /api/posts?q=검색어, 없으면 /api/posts
         // encodeURIComponent: 한글·공백·특수문자를 URL 안전한 형태로 인코딩
@@ -115,10 +78,6 @@ function SearchContent() {
         } else {
           setError("알 수 없는 오류가 발생했습니다");
         }
-
-        // ─── [실습 1: Fetch 기반 검색 기능 구현하기] 에러 처리 방식 (참고용) ─
-        // fetch는 axios.isAxiosError 같은 헬퍼가 없어 instanceof Error로만 구분
-        // err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다"
       } finally {
         // 성공·실패에 관계없이 요청이 끝나면 로딩 상태 OFF
         setLoading(false);
@@ -127,22 +86,9 @@ function SearchContent() {
 
     fetchPosts();
 
-  // ─── [실습 1: Fetch 기반 검색 기능 구현하기] 빈 배열 → 마운트 시 1회만 실행 ──
-  // (실습 2에서도 동일하게 사용)
-  // }, []);
-
-  // ─── [실습 3: 검색 기능 고도화하기] query를 의존성 배열에 추가 ──
-  // query가 바뀔 때마다 fetchPosts()가 재실행 → 백엔드에 새 검색어 전달
+    // ─── [실습 3: 검색 기능 고도화하기] query를 의존성 배열에 추가 ──
+    // query가 바뀔 때마다 fetchPosts()가 재실행 → 백엔드에 새 검색어 전달
   }, [query]);
-
-  // ─── [실습 1: Fetch 기반 검색 기능 구현하기] 검색어 기반 클라이언트 사이드 필터링 ─
-  // (실습 2에서도 동일하게 사용)
-  // results(전체 목록)를 query로 걸러냄 — 추가 네트워크 요청 없이 클라이언트에서 처리
-  // const filtered = results.filter(
-  //   (post) =>
-  //     post.title.toLowerCase().includes(query.toLowerCase()) ||
-  //     post.content.toLowerCase().includes(query.toLowerCase())
-  // );
 
   // ─── [실습 3: 검색 기능 고도화하기] 필터링은 백엔드가 담당 ──
   // results 자체가 이미 필터링된 결과 → filtered 변수 불필요
@@ -162,9 +108,6 @@ function SearchContent() {
           value={query}          → State를 화면에 반영 (단방향)
           onChange → setQuery()  → 입력을 State에 반영 (역방향)
           두 방향을 합쳐 "양방향 바인딩(controlled input)"이라고 부름
-
-          [실습 1: Fetch 기반 검색 기능 구현하기] onChange: State만 업데이트 (실습 2에서도 동일)
-          onChange={(e) => setQuery(e.target.value)}
 
           [실습 3: 검색 기능 고도화하기] State 업데이트 + URL 갱신을 동시에 수행
           router.push()로 URL을 바꾸면 브라우저 히스토리에 기록됨
@@ -200,20 +143,13 @@ function SearchContent() {
           로딩도 아니고 에러도 없을 때 결과를 렌더링                    */}
       {!loading && !error && (
         <>
-          {/* 검색어 유무에 따라 안내 문구를 다르게 표시
-              [실습 1: Fetch 기반 검색 기능 구현하기] filtered.length 사용 (실습 2에서도 동일)
-              {query
-                ? `"${query}" 검색 결과 ${filtered.length}건`
-                : `전체 ${results.length}건`}
-
-              [실습 3: 검색 기능 고도화하기] results.length 사용 — results가 곧 최종 결과 */}
+          {/* [실습 3: 검색 기능 고도화하기] results.length 사용 — results가 곧 최종 결과 */}
           <p className="text-sm text-gray-400 mb-3">
             {query
               ? `"${query}" 검색 결과 ${results.length}건`
               : `전체 ${results.length}건`}
           </p>
 
-          {/* [실습 1: Fetch 기반 검색 기능 구현하기] filtered.length === 0 (실습 2에서도 동일) */}
           {/* [실습 3: 검색 기능 고도화하기] results.length === 0 */}
           {results.length === 0 ? (
             <p className="text-center text-gray-400 py-20">
@@ -221,7 +157,6 @@ function SearchContent() {
             </p>
           ) : (
             <ul className="space-y-3">
-              {/* [실습 1: Fetch 기반 검색 기능 구현하기] filtered.map((post) => ...) (실습 2에서도 동일) */}
               {/* [실습 3: 검색 기능 고도화하기] results.map — 백엔드에서 이미 필터링된 결과를 그대로 렌더링 */}
               {results.map((post) => (
                 // key: React가 리스트 항목을 추적할 때 사용하는 고유 식별자
