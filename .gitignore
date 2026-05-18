@@ -4,6 +4,8 @@ dist/
 build/
 .next/
 out/
+__pycache__/
+.venv/
 
 # Environment variables
 .env

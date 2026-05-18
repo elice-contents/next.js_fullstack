@@ -153,7 +153,7 @@ function SearchContent() {
       {/* ─── 헤더 ──────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">게시글 검색</h1>
-        <Link href="/posts" className="text-sm text-gray-400 hover:text-gray-600">
+        <Link href="/posts" className="text-sm text-gray-400 hover:text-elice transition-colors">
           ← 목록으로
         </Link>
       </div>
@@ -177,7 +177,7 @@ function SearchContent() {
           router.push(`/search?q=${encodeURIComponent(e.target.value)}`);
         }}
         placeholder="제목 또는 내용으로 검색..."
-        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400 transition-colors mb-6"
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-elice-muted focus:ring-2 focus:ring-elice-light transition-colors mb-6"
       />
 
       {/* ─── 로딩 스피너 ─────────────────────────────────
@@ -186,7 +186,7 @@ function SearchContent() {
           border-t-blue-600: 상단 테두리만 진한 색 → 회전 시 스피너처럼 보임  */}
       {loading && (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-elice-light border-t-elice rounded-full animate-spin" />
         </div>
       )}
 
@@ -228,7 +228,7 @@ function SearchContent() {
                 <li key={post.id}>
                   <Link
                     href={`/posts/${post.id}`}
-                    className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
+                    className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-elice-muted hover:shadow-sm transition-all"
                   >
                     <p className="font-medium text-gray-900">{post.title}</p>
                     <p className="text-sm text-gray-400 mt-1">

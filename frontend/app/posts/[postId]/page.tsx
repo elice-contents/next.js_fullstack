@@ -35,7 +35,7 @@ export default async function PostDetailPage({
 
   return (
     <main>
-      <Link href="/posts" className="text-sm text-gray-400 hover:text-gray-600">
+      <Link href="/posts" className="text-sm text-gray-400 hover:text-elice transition-colors">
         ← 목록으로
       </Link>
 
@@ -50,7 +50,7 @@ export default async function PostDetailPage({
       <div className="flex gap-3 mt-4">
         <Link
           href={`/posts/${post.id}/edit`}
-          className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          className="bg-elice-light text-elice text-sm px-4 py-2 rounded-lg hover:bg-elice-light/70 transition-colors"
         >
           수정하기
         </Link>

@@ -22,23 +22,7 @@ export default async function PostsPage() {
 
   return (
     <main>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">게시글 목록</h1>
-        <div className="flex gap-2">
-          <Link
-            href="/search"
-            className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            검색
-          </Link>
-          <Link
-            href="/posts/new"
-            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            새 글 작성
-          </Link>
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">게시글 목록</h1>
 
       {posts.length === 0 ? (
         <p className="text-center text-gray-400 py-20">
@@ -50,7 +34,7 @@ export default async function PostsPage() {
             <li key={post.id}>
               <Link
                 href={`/posts/${post.id}`}
-                className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
+                className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-elice-muted hover:shadow-sm transition-all"
               >
                 <p className="font-medium text-gray-900">{post.title}</p>
                 <p className="text-sm text-gray-400 mt-1">

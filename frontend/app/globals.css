@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+  --color-elice: #524fa1;
+  --color-elice-dark: #3d3b7a;
+  --color-elice-light: #ededf8;
+  --color-elice-muted: #9390c6;
+}
