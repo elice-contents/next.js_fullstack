@@ -1,10 +1,7 @@
 # main.py — FastAPI + SQLite Blog API
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, or_
-# or_: SQLAlchemy에서 여러 조건을 OR로 연결할 때 사용하는 함수
-# 예) or_(Post.title.ilike(...), Post.content.ilike(...))
-#     → WHERE title LIKE ... OR content LIKE ...
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
@@ -76,32 +73,8 @@ def get_db():
 
 
 # ─── GET /posts ──────────────────────────────────────────
-
-# ─── [실습 1: Fetch 기반 검색 기능 구현하기] 쿼리 파라미터 없이 전체 반환 ────
-# (실습 2에서도 동일하게 사용 — Axios 리팩토링은 프런트엔드만 변경)
-# @app.get("/posts", response_model=list[PostResponse])
-# def get_posts(db: Session = Depends(get_db)):
-#     return db.query(Post).all()
-
-# ─── [실습 3: 검색 기능 고도화하기] 검색어(q)가 있으면 필터링, 없으면 전체 반환 ──
 @app.get("/posts", response_model=list[PostResponse])
-def get_posts(q: Optional[str] = None, db: Session = Depends(get_db)):
-    # q: URL 쿼리 파라미터 (?q=검색어)
-    # FastAPI는 경로 파라미터({post_id})와 달리
-    # 함수 인자로 선언하는 것만으로 쿼리 파라미터를 자동 파싱함
-    # Optional[str] = None → 검색어가 없으면 None (기존 동작 유지)
-    if q:
-        # ilike: 대소문자 구분 없는 LIKE 검색 (case-insensitive)
-        #        일반 like("%검색어%")는 대소문자를 구분함
-        # f"%{q}%": '%검색어%' 패턴 → 앞뒤로 어떤 문자든 포함되면 매칭
-        return db.query(Post).filter(
-            or_(
-                Post.title.ilike(f"%{q}%"),
-                Post.content.ilike(f"%{q}%"),
-            )
-        ).all()
-
-    # q가 없으면 기존과 동일하게 전체 반환
+def get_posts(db: Session = Depends(get_db)):
     return db.query(Post).all()
 
 
@@ -119,12 +92,12 @@ def get_post(post_id: int, db: Session = Depends(get_db)):
 def create_post(data: PostCreate, db: Session = Depends(get_db)):
     try:
         post = Post(title=data.title, content=data.content)
-        db.add(post)      # 트랜잭션에 추가 (아직 DB에 기록되지 않음)
-        db.commit()       # DB에 영구 반영
-        db.refresh(post)  # id, created_at 등 DB 자동 생성 값 재조회
+        db.add(post)
+        db.commit()
+        db.refresh(post)
         return post
     except Exception as e:
-        db.rollback()     # 실패 시 변경사항 전체 취소
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"게시글 생성 실패: {str(e)}")
 
 
@@ -154,9 +127,8 @@ def delete_post(post_id: int, db: Session = Depends(get_db)):
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
-        db.delete(post)  # 삭제 대상으로 표시
-        db.commit()      # DB에서 영구 삭제
+        db.delete(post)
+        db.commit()
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"게시글 삭제 실패: {str(e)}")
-    # 204 No Content: 삭제 성공 시 응답 바디 없음
