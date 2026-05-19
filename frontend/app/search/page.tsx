@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -23,7 +24,7 @@ export default function SearchPage() {
       setError(null);
 
       try {
-        const res = await fetch("/api/posts");
+        const res = await fetch(bp("/api/posts"));
         // fetch는 4xx·5xx를 정상 응답으로 간주하므로 res.ok를 직접 확인해야 함
         if (!res.ok) {
           throw new Error("게시글 목록을 불러오는 데 실패했습니다");
@@ -51,7 +52,7 @@ export default function SearchPage() {
     <main>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">게시글 검색</h1>
-        <Link href="/posts" className="text-sm text-gray-400 hover:text-gray-600">
+        <Link href={bp("/posts")} className="text-sm text-gray-400 hover:text-gray-600">
           ← 목록으로
         </Link>
       </div>
@@ -91,7 +92,7 @@ export default function SearchPage() {
               {filtered.map((post) => (
                 <li key={post.id}>
                   <Link
-                    href={`/posts/${post.id}`}
+                    href={bp(`/posts/${post.id}`)}
                     className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
                   >
                     <p className="font-medium text-gray-900">{post.title}</p>
