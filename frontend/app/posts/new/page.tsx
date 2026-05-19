@@ -1,12 +1,13 @@
 // app/posts/new/page.tsx — 새 게시글 작성 폼 (Server Component)
 import Link from "next/link";
 import { createPost } from "@/app/actions";
+import { bp } from "@/app/lib/path";
 
 export default function NewPostPage() {
   return (
     <main>
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/posts" className="text-gray-400 hover:text-elice transition-colors text-sm">
+        <Link href={bp("/posts")} className="text-gray-400 hover:text-elice transition-colors text-sm">
           ← 목록으로
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">새 게시글 작성</h1>

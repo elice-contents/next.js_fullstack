@@ -1,5 +1,6 @@
 // app/posts/page.tsx — 게시글 목록 (Server Component)
 import Link from "next/link";
+import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -33,7 +34,7 @@ export default async function PostsPage() {
           {posts.map((post) => (
             <li key={post.id}>
               <Link
-                href={`/posts/${post.id}`}
+                href={bp(`/posts/${post.id}`)}
                 className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-elice-muted hover:shadow-sm transition-all"
               >
                 <p className="font-medium text-gray-900">{post.title}</p>
