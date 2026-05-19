@@ -1,6 +1,6 @@
 // app/search/page.tsx — 검색 페이지 (Client Component)
 //
-// 이 파일에는 두 가지 방식의 구현이 담겨 있습니다.
+// 이 파일에는 두 가지 방식의 구현이 담겨 있습니다
 //   [실습 1] Direct Fetch   : 브라우저 → FastAPI 직접 호출 (주석 처리됨)
 //   [실습 1] Route Handler  : 브라우저 → Route Handler → FastAPI (활성)
 
