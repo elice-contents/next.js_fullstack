@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -26,7 +27,7 @@ export default function SearchPage() {
       try {
         // axios.get<타입>(URL) → 응답 데이터가 res.data에 바로 담김
         // fetch와 달리 res.json() 호출 불필요, 4xx·5xx는 자동으로 throw
-        const res = await axios.get<Post[]>("/api/posts");
+        const res = await axios.get<Post[]>(bp("/api/posts"));
         setResults(res.data);
       } catch (err) {
         // axios.isAxiosError: axios가 던진 에러인지 확인하는 타입 가드
@@ -56,7 +57,7 @@ export default function SearchPage() {
     <main>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">게시글 검색</h1>
-        <Link href="/posts" className="text-sm text-gray-400 hover:text-gray-600">
+        <Link href={bp("/posts")} className="text-sm text-gray-400 hover:text-gray-600">
           ← 목록으로
         </Link>
       </div>
@@ -96,7 +97,7 @@ export default function SearchPage() {
               {filtered.map((post) => (
                 <li key={post.id}>
                   <Link
-                    href={`/posts/${post.id}`}
+                    href={bp(`/posts/${post.id}`)}
                     className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
                   >
                     <p className="font-medium text-gray-900">{post.title}</p>

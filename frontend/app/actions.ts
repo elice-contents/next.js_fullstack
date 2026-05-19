@@ -2,6 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { bp } from "./lib/path";
 
 // ─── 게시글 생성 ─────────────────────────────────────────
 export async function createPost(formData: FormData) {
@@ -20,7 +21,7 @@ export async function createPost(formData: FormData) {
   }
 
   revalidateTag("posts-list");
-  redirect("/posts");
+  redirect(bp("/posts"));
   // ✅ redirect()는 반드시 try-catch 바깥에서 호출
   //    내부적으로 NEXT_REDIRECT를 throw하므로
   //    catch 블록 안에 있으면 잡혀서 동작하지 않음
@@ -43,7 +44,7 @@ export async function updatePost(postId: number, formData: FormData) {
   }
 
   revalidateTag("posts-list");
-  redirect(`/posts/${postId}`);
+  redirect(bp(`/posts/${postId}`));
 }
 
 // ─── 게시글 삭제 ─────────────────────────────────────────
@@ -59,5 +60,5 @@ export async function deletePost(postId: number) {
   }
 
   revalidateTag("posts-list");
-  redirect("/posts");
+  redirect(bp("/posts"));
 }
