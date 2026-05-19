@@ -18,6 +18,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 // axios는 별도 패키지이므로 반드시 import 필요 (npm install axios)
 import axios from "axios";
 import Link from "next/link";
+import { bp } from "@/app/lib/path";
 
 // ─── 타입 정의 ───────────────────────────────────────────
 // FastAPI /posts 응답의 각 게시글 객체 형태
@@ -61,8 +62,8 @@ function SearchContent() {
         // encodeURIComponent: 한글·공백·특수문자를 URL 안전한 형태로 인코딩
         // 예) "Next.js 입문" → "Next.js%20%EC%9E%85%EB%AC%B8"
         const url = query
-          ? `/api/posts?q=${encodeURIComponent(query)}`
-          : `/api/posts`;
+          ? bp(`/api/posts?q=${encodeURIComponent(query)}`)
+          : bp(`/api/posts`);
         const res = await axios.get<Post[]>(url);
         setResults(res.data);
       } catch (err) {
@@ -99,7 +100,7 @@ function SearchContent() {
       {/* ─── 헤더 ──────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">게시글 검색</h1>
-        <Link href="/posts" className="text-sm text-gray-400 hover:text-gray-600">
+        <Link href={bp("/posts")} className="text-sm text-gray-400 hover:text-gray-600">
           ← 목록으로
         </Link>
       </div>
@@ -117,7 +118,7 @@ function SearchContent() {
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
-          router.push(`/search?q=${encodeURIComponent(e.target.value)}`);
+          router.push(bp(`/search?q=${encodeURIComponent(e.target.value)}`));
         }}
         placeholder="제목 또는 내용으로 검색..."
         className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400 transition-colors mb-6"
@@ -162,7 +163,7 @@ function SearchContent() {
                 // key: React가 리스트 항목을 추적할 때 사용하는 고유 식별자
                 <li key={post.id}>
                   <Link
-                    href={`/posts/${post.id}`}
+                    href={bp(`/posts/${post.id}`)}
                     className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
                   >
                     <p className="font-medium text-gray-900">{post.title}</p>
