@@ -23,6 +23,10 @@ yarn-error.log*
 # OS Metadata
 .DS_Store
 Thumbs.db
+.rsrc
+**/.rsrc
+__MACOSX/
+._*
 
 # IDE settings
 .vscode/
