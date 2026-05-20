@@ -2,12 +2,13 @@
 //
 // 이 파일에는 두 가지 방식의 구현이 담겨 있습니다
 //   [실습 1] Direct Fetch   : 브라우저 → FastAPI 직접 호출 (주석 처리됨)
-//   [실습 1] Route Handler  : 브라우저 → Route Handler → FastAPI (활성)
+//   [실습 2] axios          : 브라우저 → Route Handler → FastAPI (활성)
 
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios";
 
 type Post = {
   id: number;
@@ -56,13 +57,12 @@ export default function SearchPage() {
   */
 
   // =========================================================================
-  // [실습 1] Route Handler 방식
+  // [실습 2] axios 방식
   //   흐름: 브라우저 → /api/search (Route Handler) → FastAPI
   //
   //   포인트:
-  //   - 브라우저는 같은 Next.js 서버(/api/search)만 호출 → CORS 불필요
-  //   - Route Handler 가 서버에서 FastAPI 를 호출
-  //     → FASTAPI_URL 은 서버 사이드 환경 변수이므로 NEXT_PUBLIC_ 불필요
+  //   - fetch 대신 axios를 사용하도록 리팩토링
+  //   - axios.isAxiosError()로 HTTP 에러와 네트워크 에러를 구분하여 처리
   // =========================================================================
 
   // BASE_PATH: 클라이언트에서 Route Handler 경로를 올바르게 구성하기 위해 필요
@@ -72,14 +72,17 @@ export default function SearchPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`${BASE_PATH}/api/search`)
-      .then((res) => {
-        if (!res.ok) throw new Error("게시글을 불러오는 데 실패했습니다");
-        return res.json();
+    axios
+      .get<Post[]>(`${BASE_PATH}/api/search`)
+      .then((res) => setResults(res.data))
+      .catch((err) => {
+        if (axios.isAxiosError(err)) {
+          setError(err.response?.data?.detail ?? "게시글을 불러오는 데 실패했습니다");
+        } else {
+          setError("알 수 없는 오류가 발생했습니다");
+        }
       })
-      .then((data: Post[]) => setResults(data))
-      .catch((err: Error) => setError(err.message))   // [실습 1] catch 블록: 에러 상태 업데이트
-      .finally(() => setLoading(false));               // [실습 1] finally 블록: 로딩 상태 해제
+      .finally(() => setLoading(false));
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
