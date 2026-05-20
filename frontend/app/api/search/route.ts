@@ -1,14 +1,25 @@
 // app/api/search/route.ts — Route Handler
 //
-// [실습 3] 검색 기능 고도화
-//   흐름: 브라우저 → GET /api/search?q=검색어 → FastAPI?q=검색어
+// [실습 2 완성] 항상 전체 목록을 반환하는 Route Handler
+//   흐름: 브라우저 → GET /api/search → FastAPI /posts (전체)
 //
-//   브라우저가 q 쿼리 파라미터를 포함해 요청하면,
-//   이 핸들러가 동일한 q를 FastAPI로 전달하여 서버사이드 필터링을 수행합니다.
+// [실습 3] TODO: 브라우저의 q 쿼리 파라미터를 FastAPI로 전달해보세요.
+//
+//   1. GET() 의 인자로 request: NextRequest 를 추가하세요.
+//      → import { NextRequest, NextResponse } from "next/server"
+//
+//   2. request.nextUrl.searchParams.get("q") 로 검색어를 파싱하세요.
+//
+//   3. q 유무에 따라 FastAPI 호출 URL을 분기하세요.
+//      → q 있음: `${fastapiUrl}/posts?q=${encodeURIComponent(q)}`
+//      → q 없음: `${fastapiUrl}/posts`
+//      (encodeURIComponent: 한글·공백·특수문자를 안전하게 인코딩)
+//
+//   4. 완성 후 아래 기존 fetch 라인을 교체하세요.
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const fastapiUrl = process.env.FASTAPI_URL;
 
   if (!fastapiUrl) {
@@ -18,16 +29,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // 브라우저 요청에서 q 쿼리 파라미터 파싱
-  const q = request.nextUrl.searchParams.get("q");
-
-  // q 유무에 따라 FastAPI 호출 URL 분기
-  // encodeURIComponent: 한글·특수문자·공백이 포함된 검색어를 안전하게 인코딩
-  const url = q
-    ? `${fastapiUrl}/posts?q=${encodeURIComponent(q)}`
-    : `${fastapiUrl}/posts`;
-
-  const res = await fetch(url);
+  const res = await fetch(`${fastapiUrl}/posts`);
 
   if (!res.ok) {
     return NextResponse.json(

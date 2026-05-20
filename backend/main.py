@@ -1,7 +1,7 @@
 # main.py — FastAPI + SQLite Blog API
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, or_
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
@@ -83,16 +83,18 @@ def get_db():
 
 # ─── GET /posts ──────────────────────────────────────────
 @app.get("/posts", response_model=list[PostResponse])
-def get_posts(
-    db: Session = Depends(get_db),
-    q: Optional[str] = Query(default=None, description="제목 또는 내용 검색어"),
-):
-    if q:
-        return (
-            db.query(Post)
-            .filter(or_(Post.title.contains(q), Post.content.contains(q)))
-            .all()
-        )
+def get_posts(db: Session = Depends(get_db)):
+    # [실습 3] TODO: 옵셔널 쿼리 파라미터 q 를 추가하고, 서버사이드 필터링을 구현해보세요.
+    #
+    #   1. 함수 인자에 q: Optional[str] = None 을 추가하세요.
+    #      (fastapi.Query 를 사용해 description 을 추가하면 더 좋습니다)
+    #
+    #   2. q 가 있을 때는 SQLAlchemy or_() 를 활용해 title 또는 content 에
+    #      검색어가 포함된 게시글만 반환하세요.
+    #      → from sqlalchemy import or_ 임포트 필요
+    #      → Post.title.contains(q), Post.content.contains(q)
+    #
+    #   3. q 가 없을 때는 전체 목록을 반환하세요.
     return db.query(Post).all()
 
 
