@@ -8,7 +8,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -65,13 +64,15 @@ export default function SearchPage() {
   //   - Route Handler 가 서버에서 FastAPI 를 호출
   //     → FASTAPI_URL 은 서버 사이드 환경 변수이므로 NEXT_PUBLIC_ 불필요
   // =========================================================================
+
+  // BASE_PATH: 클라이언트에서 Route Handler 경로를 올바르게 구성하기 위해 필요
+  const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    // NEXT_PUBLIC_BASE_PATH: 클라이언트에서 Route Handler 경로를 올바르게 구성하기 위해 필요
-    // (bp() 는 서버 사이드 전용이므로, 클라이언트 fetch URL 에는 NEXT_PUBLIC_ 변수를 사용)
-    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/search`)
+    fetch(`${BASE_PATH}/api/search`)
       .then((res) => {
         if (!res.ok) throw new Error("게시글을 불러오는 데 실패했습니다");
         return res.json();
@@ -93,7 +94,7 @@ export default function SearchPage() {
   return (
     <main>
       <div className="flex items-center gap-3 mb-6">
-        <Link href={bp("/posts")} className="text-gray-400 hover:text-gray-600 text-sm">
+        <Link href={`${BASE_PATH}/posts`} className="text-gray-400 hover:text-gray-600 text-sm">
           ← 목록으로
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">검색</h1>
@@ -131,7 +132,7 @@ export default function SearchPage() {
           {filtered.map((post) => (
             <li key={post.id}>
               <Link
-                href={bp(`/posts/${post.id}`)}
+                href={`${BASE_PATH}/posts/${post.id}`}
                 className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
               >
                 <p className="font-medium text-gray-900">{post.title}</p>

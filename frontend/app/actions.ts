@@ -2,7 +2,6 @@
 
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { bp } from "@/app/lib/path";
 
 // ─── 게시글 생성 ─────────────────────────────────────────
 export async function createPost(formData: FormData) {
@@ -21,7 +20,7 @@ export async function createPost(formData: FormData) {
   }
 
   revalidateTag("posts-list");
-  redirect(bp("/posts"));
+  redirect("/posts");
   // ✅ redirect()는 반드시 try-catch 바깥에서 호출
   //    내부적으로 NEXT_REDIRECT를 throw하므로
   //    catch 블록 안에 있으면 잡혀서 동작하지 않음
@@ -44,21 +43,5 @@ export async function updatePost(postId: number, formData: FormData) {
   }
 
   revalidateTag("posts-list");
-  redirect(bp(`/posts/${postId}`));
-}
-
-// ─── 게시글 삭제 ─────────────────────────────────────────
-export async function deletePost(postId: number) {
-  const res = await fetch(`${process.env.FASTAPI_URL}/posts/${postId}`, {
-    method: "DELETE",
-  });
-
-  if (!res.ok) {
-    // 204 No Content가 아닌 경우에만 에러 처리
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.detail ?? "게시글 삭제에 실패했습니다");
-  }
-
-  revalidateTag("posts-list");
-  redirect(bp("/posts"));
+  redirect(`/posts/${postId}`);
 }

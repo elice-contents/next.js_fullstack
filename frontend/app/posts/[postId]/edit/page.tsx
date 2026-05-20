@@ -1,7 +1,6 @@
 // app/posts/[postId]/edit/page.tsx — 게시글 수정 폼 (Server Component)
 import Link from "next/link";
 import { updatePost } from "@/app/actions";
-import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -33,11 +32,14 @@ export default async function EditPostPage({
   // bind(null, post.id): updatePost의 첫 번째 인자(postId)를 미리 고정
   const boundUpdatePost = updatePost.bind(null, post.id);
 
+  const BASE_PATH = process.env.BASE_PATH ?? "";
+
+
   return (
     <main>
       <div className="flex items-center gap-3 mb-6">
         <Link
-          href={bp(`/posts/${post.id}`)}
+          href={`${BASE_PATH}/posts/${post.id}`}
           className="text-gray-400 hover:text-gray-600 text-sm"
         >
           ← 상세로

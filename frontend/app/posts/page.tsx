@@ -1,6 +1,5 @@
 // app/posts/page.tsx — 게시글 목록 (Server Component)
 import Link from "next/link";
-import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -10,6 +9,8 @@ type Post = {
 };
 
 export default async function PostsPage() {
+  const BASE_PATH = process.env.BASE_PATH ?? "";
+
   // ✅ Server Component → FastAPI 직접 호출 (Route Handler 경유 금지)
   const res = await fetch(`${process.env.FASTAPI_URL}/posts`, {
     next: { tags: ["posts-list"] },
@@ -27,13 +28,13 @@ export default async function PostsPage() {
         <h1 className="text-2xl font-bold text-gray-900">게시글 목록</h1>
         <div className="flex gap-2">
           <Link
-            href={bp("/search")}
+            href={`${BASE_PATH}/search`}
             className="border border-gray-300 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
           >
             검색
           </Link>
           <Link
-            href={bp("/posts/new")}
+            href={`${BASE_PATH}/posts/new`}
             className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             새 글 작성
@@ -50,7 +51,7 @@ export default async function PostsPage() {
           {posts.map((post) => (
             <li key={post.id}>
               <Link
-                href={bp(`/posts/${post.id}`)}
+                href={`${BASE_PATH}/posts/${post.id}`}
                 className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-sm transition-all"
               >
                 <p className="font-medium text-gray-900">{post.title}</p>

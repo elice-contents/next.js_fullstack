@@ -1,7 +1,6 @@
 // app/posts/[postId]/page.tsx — 게시글 상세 (Server Component)
 import Link from "next/link";
 import DeleteButton from "./DeleteButton";
-import { bp } from "@/app/lib/path";
 
 type Post = {
   id: number;
@@ -21,6 +20,8 @@ export default async function PostDetailPage({
     cache: "no-store",
   });
 
+  const BASE_PATH = process.env.BASE_PATH ?? "";
+
   if (res.status === 404) {
     return (
       <div className="text-center py-20 text-gray-400">
@@ -36,7 +37,7 @@ export default async function PostDetailPage({
 
   return (
     <main>
-      <Link href={bp("/posts")} className="text-sm text-gray-400 hover:text-gray-600">
+      <Link href={`${BASE_PATH}/posts`} className="text-sm text-gray-400 hover:text-gray-600">
         ← 목록으로
       </Link>
 
@@ -50,7 +51,7 @@ export default async function PostDetailPage({
 
       <div className="flex gap-3 mt-4">
         <Link
-          href={bp(`/posts/${post.id}/edit`)}
+          href={`${BASE_PATH}/posts/${post.id}/edit`}
           className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
         >
           수정하기

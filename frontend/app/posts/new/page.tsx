@@ -1,13 +1,14 @@
 // app/posts/new/page.tsx — 새 게시글 작성 폼 (Server Component)
 import Link from "next/link";
 import { createPost } from "@/app/actions";
-import { bp } from "@/app/lib/path";
 
 export default function NewPostPage() {
+  const BASE_PATH = process.env.BASE_PATH ?? "";
+
   return (
     <main>
       <div className="flex items-center gap-3 mb-6">
-        <Link href={bp("/posts")} className="text-gray-400 hover:text-gray-600 text-sm">
+        <Link href={`${BASE_PATH}/posts`} className="text-gray-400 hover:text-gray-600 text-sm">
           ← 목록으로
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">새 게시글 작성</h1>
