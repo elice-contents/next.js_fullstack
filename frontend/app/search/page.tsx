@@ -69,20 +69,25 @@ export default function SearchPage() {
   const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    async function fetchPosts() {
+      setLoading(true);
+      setError(null);
 
-    axios
-      .get<Post[]>(`${BASE_PATH}/api/search`)
-      .then((res) => setResults(res.data))
-      .catch((err) => {
+      try {
+        const res = await axios.get<Post[]>(`${BASE_PATH}/api/search`);
+        setResults(res.data);
+      } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err.response?.data?.detail ?? "게시글을 불러오는 데 실패했습니다");
         } else {
           setError("알 수 없는 오류가 발생했습니다");
         }
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
