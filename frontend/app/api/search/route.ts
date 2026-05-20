@@ -1,17 +1,14 @@
 // app/api/search/route.ts — Route Handler
 //
-// [실습 1] Route Handler 방식
-//   흐름: 브라우저 → GET /api/search (이 파일) → FastAPI
+// [실습 3] 검색 기능 고도화
+//   흐름: 브라우저 → GET /api/search?q=검색어 → FastAPI?q=검색어
 //
-//   브라우저가 /api/search 로 요청하면, 이 서버 사이드 핸들러가
-//   FastAPI 를 대신 호출하고 결과를 브라우저에 반환합니다.
-//   → 브라우저 입장에서는 같은 서버(Next.js)와만 통신 → CORS 불필요
+//   브라우저가 q 쿼리 파라미터를 포함해 요청하면,
+//   이 핸들러가 동일한 q를 FastAPI로 전달하여 서버사이드 필터링을 수행합니다.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-  // FASTAPI_URL 은 서버 사이드 환경 변수 (.env.local)
-  // 서버에서 실행되므로 NEXT_PUBLIC_ 접두사 없어도 접근 가능
+export async function GET(request: NextRequest) {
   const fastapiUrl = process.env.FASTAPI_URL;
 
   if (!fastapiUrl) {
@@ -21,8 +18,16 @@ export async function GET() {
     );
   }
 
-  // Route Handler → FastAPI 호출
-  const res = await fetch(`${fastapiUrl}/posts`);
+  // 브라우저 요청에서 q 쿼리 파라미터 파싱
+  const q = request.nextUrl.searchParams.get("q");
+
+  // q 유무에 따라 FastAPI 호출 URL 분기
+  // encodeURIComponent: 한글·특수문자·공백이 포함된 검색어를 안전하게 인코딩
+  const url = q
+    ? `${fastapiUrl}/posts?q=${encodeURIComponent(q)}`
+    : `${fastapiUrl}/posts`;
+
+  const res = await fetch(url);
 
   if (!res.ok) {
     return NextResponse.json(
@@ -32,7 +37,5 @@ export async function GET() {
   }
 
   const data = await res.json();
-
-  // FastAPI 응답을 그대로 브라우저에 전달
   return NextResponse.json(data);
 }

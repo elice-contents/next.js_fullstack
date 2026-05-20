@@ -1,7 +1,7 @@
 # main.py — FastAPI + SQLite Blog API
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, or_
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
@@ -83,7 +83,16 @@ def get_db():
 
 # ─── GET /posts ──────────────────────────────────────────
 @app.get("/posts", response_model=list[PostResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(
+    db: Session = Depends(get_db),
+    q: Optional[str] = Query(default=None, description="제목 또는 내용 검색어"),
+):
+    if q:
+        return (
+            db.query(Post)
+            .filter(or_(Post.title.contains(q), Post.content.contains(q)))
+            .all()
+        )
     return db.query(Post).all()
 
 
