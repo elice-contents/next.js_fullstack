@@ -17,45 +17,30 @@ export default function SearchPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // BASE_PATH: 런박스 환경에서 Client Component가 Route Handler 경로를 올바르게
-  //            구성하기 위해 필요합니다. 로컬 환경에서는 빈 문자열로 동작합니다.
+  // BASE_PATH: 런박스 환경에서 Client Component가 Route Handler 경로를 올바르게 구성하기 위해 필요합니다. 
+  // .env.local 파일에 NEXT_PUBLIC_BASE_PATH='/proxy/3000'이 포함되어 있는지 확인해주세요.
   const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   // ===========================================================================
   // [실습 1] Direct Fetch 방식
   //   흐름: 브라우저 → FastAPI (NEXT_PUBLIC_FASTAPI_URL/posts) 직접 호출
-  //
-  //   포인트:
-  //   - 클라이언트(브라우저)에서 환경 변수를 읽으려면 NEXT_PUBLIC_ 접두사 필요
-  //     → .env.local 의 NEXT_PUBLIC_FASTAPI_URL 사용
-  //   - 브라우저가 다른 출처(8000포트)로 요청하므로 CORS 설정 필수
-  //     → backend/main.py 의 allow_origins 확인
-  //
-  //   TODO: 아래 useEffect 블록을 완성해보세요.
-  //         완성 후 Route Handler 방식(아래)은 주석 처리하세요.
+  //   TODO: 아래 useEffect 블록을 완성해보세요.완성 후 Route Handler 방식(아래)은 주석 처리하세요.
   // ===========================================================================
   /*
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    // TODO: process.env.NEXT_PUBLIC_FASTAPI_URL 을 사용해 /posts 를 fetch 하세요.
-    //       성공 시 setResults, 실패 시 setError, 완료 시 setLoading(false) 처리.
-
-  }, []);
+    useEffect(() => {
+      setLoading(true);
+      setError(null);
+  
+      // TODO: process.env.NEXT_PUBLIC_FASTAPI_URL 을 사용해 /posts 를 fetch 하세요.
+      //       성공 시 setResults, 실패 시 setError, 완료 시 setLoading(false) 처리.
+  
+    }, []);
   */
 
   // ===========================================================================
   // [실습 1] Route Handler 방식
   //   흐름: 브라우저 → /api/search (Route Handler) → FastAPI
-  //
-  //   포인트:
-  //   - 브라우저는 같은 Next.js 서버(/api/search)만 호출 → CORS 불필요
-  //   - Route Handler 가 서버에서 FastAPI 를 대신 호출
-  //     → FASTAPI_URL 은 서버 사이드 전용 환경 변수이므로 NEXT_PUBLIC_ 불필요
-  //
   //   TODO: 아래 useEffect 블록을 완성해보세요.
-  //         BASE_PATH 변수를 활용해 올바른 URL을 구성하세요.
   // ===========================================================================
   useEffect(() => {
     setLoading(true);
@@ -64,7 +49,7 @@ export default function SearchPage() {
     // TODO: `${BASE_PATH}/api/search` 를 fetch 하세요.
     //       성공 시 setResults, 실패 시 setError, 완료 시 setLoading(false) 처리.
 
-  }, [BASE_PATH]);
+  }, []);
 
   // ===========================================================================
   // TODO: results 배열을 query 로 필터링하는 로직을 구현해보세요.
