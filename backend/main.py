@@ -1,8 +1,8 @@
 # main.py — FastAPI + SQLite Blog API
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy import create_engine, Integer, String, Text, DateTime, select, or_
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
 from typing import Optional
@@ -11,16 +11,19 @@ from typing import Optional
 DATABASE_URL = "sqlite:///./blog.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 # ─── 모델 (DB 테이블) ────────────────────────────────────
 class Post(Base):
     __tablename__ = "posts"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(200), nullable=False)
-    content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 Base.metadata.create_all(bind=engine)
@@ -91,17 +94,17 @@ def get_posts(db: Session = Depends(get_db)):
     #
     #   2. q 가 있을 때는 SQLAlchemy or_() 를 활용해 title 또는 content 에
     #      검색어가 포함된 게시글만 반환하세요.
-    #      → from sqlalchemy import or_ 임포트 필요
+    #      → or_() 는 이미 임포트되어 있습니다
     #      → Post.title.contains(q), Post.content.contains(q)
     #
     #   3. q 가 없을 때는 전체 목록을 반환하세요.
-    return db.query(Post).all()
+    return db.execute(select(Post)).scalars().all()
 
 
 # ─── GET /posts/{post_id} ────────────────────────────────
 @app.get("/posts/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     return post
@@ -124,7 +127,7 @@ def create_post(data: PostCreate, db: Session = Depends(get_db)):
 # ─── PUT /posts/{post_id} ────────────────────────────────
 @app.put("/posts/{post_id}", response_model=PostResponse)
 def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
@@ -143,7 +146,7 @@ def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
 # ─── DELETE /posts/{post_id} ─────────────────────────────
 @app.delete("/posts/{post_id}", status_code=204)
 def delete_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
