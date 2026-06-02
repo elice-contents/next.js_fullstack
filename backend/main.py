@@ -1,7 +1,7 @@
 # main.py — FastAPI + SQLite Blog API
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, select
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
@@ -84,13 +84,13 @@ def get_db():
 # ─── GET /posts ──────────────────────────────────────────
 @app.get("/posts", response_model=list[PostResponse])
 def get_posts(db: Session = Depends(get_db)):
-    return db.query(Post).all()
+    return db.execute(select(Post)).scalars().all()
 
 
 # ─── GET /posts/{post_id} ────────────────────────────────
 @app.get("/posts/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     return post
@@ -113,7 +113,7 @@ def create_post(data: PostCreate, db: Session = Depends(get_db)):
 # ─── PUT /posts/{post_id} ────────────────────────────────
 @app.put("/posts/{post_id}", response_model=PostResponse)
 def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
@@ -132,7 +132,7 @@ def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
 # ─── DELETE /posts/{post_id} ─────────────────────────────
 @app.delete("/posts/{post_id}", status_code=204)
 def delete_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
